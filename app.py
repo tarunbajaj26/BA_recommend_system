@@ -66,6 +66,7 @@ st.markdown("""
 
 st.markdown("""
     <div class='top-banner'>  
+        <img src='https://assets.upgrad.com/2781/_next/static/media/upgrad-header-logo.325f003e.svg'>
         <img src='https://mentormind-static-assets.s3.ap-south-1.amazonaws.com/mentormind_logo.png'>
     </div>
 """, unsafe_allow_html=True)
@@ -256,4 +257,5 @@ if st.button("Get Recommendations from Query 🔍"):
             st.warning("No recommendations found for your query.")
     else:
         st.error("Please type something to get recommendations.")
+
 
