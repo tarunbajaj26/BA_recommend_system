@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+OPENROUTER_API_KEY = st.secrets["OPENROUTER_API_KEY"]
 
 # Streamlit Page Config
 st.set_page_config(page_title="Mentor-Led Internships For You!!", page_icon="🎯", layout="wide")
@@ -256,3 +256,4 @@ if st.button("Get Recommendations from Query 🔍"):
             st.warning("No recommendations found for your query.")
     else:
         st.error("Please type something to get recommendations.")
+
