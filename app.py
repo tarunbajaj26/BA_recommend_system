@@ -61,9 +61,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-
 # ✅ Add Banner with Two Logos (UpGrad & MentorMind)
-
 st.markdown("""
     <div class='top-banner'>  
         <img src='https://assets.upgrad.com/2781/_next/static/media/upgrad-header-logo.325f003e.svg'>
@@ -124,12 +122,12 @@ def recommend_menternships(domains, job_roles, experience_levels, tools, skills)
         if tools and any(any(t.lower() in tl.lower() for tl in tools_list) for t in tools):
             match_count += 1
 
-        # ✅ Show if at least 3 matches
+        # ✅ Dropdown-based condition remains strict
         if match_count >= 3:
             recommendations.append({
                 "Menternship": menternship,
                 "Company": ment_df["Company Name"].iloc[0],
-                "Experience Level": ", ".join(experience_levels) if experience_levels else "All",
+                "Experience Level": ment_df["Experience level"].iloc[0],  # ✅ Actual internship level
                 "Domain": domain_list,
                 "Skills": skills_list,
                 "Tools": tools_list,
@@ -140,7 +138,6 @@ def recommend_menternships(domains, job_roles, experience_levels, tools, skills)
             })
 
     return recommendations
-
 
 # ✅ Extract structured info from query using OpenRouter API
 def extract_requirements_from_query(query):
@@ -198,7 +195,6 @@ if get_rec:
     if recs:
         st.success(f"✅ {len(recs)} Menternships match your preferences")
 
-        # ✅ Display in two columns for less scrolling
         cols = st.columns(2)
         for i, r in enumerate(recs):
             with cols[i % 2]:
@@ -232,7 +228,24 @@ if st.button("Get Recommendations from Query 🔍"):
         matched_skills = extracted.get("skills", [])
         matched_tools = extracted.get("tools", [])
 
-        recs = recommend_menternships(matched_domains, matched_job_roles, [], matched_tools, matched_skills)
+        # ✅ Get all recommendations from main function
+        all_recs = recommend_menternships(matched_domains, matched_job_roles, [], matched_tools, matched_skills)
+
+        # ✅ Apply relaxed filter for query-based search (>=1 match)
+        recs = []
+        for r in all_recs:
+            match_count = 0
+            if matched_domains and any(d.lower() in [dl.lower() for dl in r['Domain']] for d in matched_domains):
+                match_count += 1
+            if matched_job_roles and any(j.lower() in [jr.lower() for jr in r['Job Roles']] for j in matched_job_roles):
+                match_count += 1
+            if matched_skills and any(any(s.lower() in sk.lower() for sk in r['Skills']) for s in matched_skills):
+                match_count += 1
+            if matched_tools and any(any(t.lower() in tl.lower() for tl in r['Tools']) for t in matched_tools):
+                match_count += 1
+
+            if match_count >= 1:  # ✅ Relaxed condition for query-based search
+                recs.append(r)
 
         st.subheader("🔍 Recommendations from Query:")
         if recs:
@@ -244,6 +257,7 @@ if st.button("Get Recommendations from Query 🔍"):
                     st.markdown(f"""
                         <div class='recommend-card'>
                             <h3>{r['Menternship']} at {r['Company']}</h3>
+                            <p><b>Experience Level:</b> {r['Experience Level']}</p>
                             <p><b>Domain:</b> {', '.join(r['Domain'])}</p>
                             <p><b>Skills:</b> {', '.join(r['Skills'])}</p>
                             <p><b>Tools:</b> {', '.join(r['Tools'])}</p>
@@ -257,5 +271,3 @@ if st.button("Get Recommendations from Query 🔍"):
             st.warning("No recommendations found for your query.")
     else:
         st.error("Please type something to get recommendations.")
-
-
